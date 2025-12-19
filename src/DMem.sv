@@ -3,7 +3,6 @@
 */
 
 module DMem(
-    input wire clk,  // 时钟信号
     input wire we,   // 写使能信号
     input wire re,   // 读使能信号
     input wire [31:0] data_addr,  // 数据地址
@@ -22,7 +21,7 @@ module DMem(
 
     // 写操作
     wire [9:0] word_addr = data_addr[11:2];  // 字节地址转换为字地址
-    always @(posedge clk) begin
+    always @(*) begin
         if (we && (word_addr < 1024)) begin
             data_mem[word_addr] <= data_write;
         end

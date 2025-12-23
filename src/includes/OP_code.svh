@@ -19,5 +19,6 @@
 `define OP_CODE_BGEZ 6'b000001
 `define OP_CODE_J 6'b000010
 `define OP_CODE_JAL 6'b000011
+`define OP_CODE_LUI 6'b001111
 
 `endif 

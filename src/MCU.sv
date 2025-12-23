@@ -1,7 +1,3 @@
-/*
-    实现MIPS中的控制器MCU
-*/
-
 `include "includes/OP_code.svh"
 
 module MCU(
@@ -14,7 +10,8 @@ module MCU(
     output wire MemRd,  // 用于控制DMem的读信号
     output wire ALUSrc,  // 用于多路选择器
     output wire RegDst,  // 用于多路选择器
-    output wire RegWr  // 用于RF的写信号
+    output wire RegWr,  // 用于RF的写信号
+    output wire sigext_high
 );
     
     reg Branch_reg;
@@ -26,6 +23,7 @@ module MCU(
     reg ALUSrc_reg;
     reg RegDst_reg;
     reg RegWr_reg;
+    reg sigext_high_reg;
 
     // 使用阻塞赋值实现组合逻辑
     always @(*) begin
@@ -39,6 +37,7 @@ module MCU(
         ALUSrc_reg = 1'b0;
         RegDst_reg = 1'b0;
         RegWr_reg = 1'b0;
+        sigext_high_reg = 1'b0;
 
         // 根据op_code设置控制信号
         case (op_code)
@@ -211,6 +210,18 @@ module MCU(
                 ALUOp_reg = 2'b10;
                 Jump_reg = 1'b0;
             end
+            `OP_CODE_LUI:begin      //new-------
+                RegDst_reg = 1'b0;
+                ALUSrc_reg = 1'b1;
+                MemtoReg_reg = 1'b0;
+                RegWr_reg = 1'b1;
+                MemRd_reg = 1'b0;
+                MemWr_reg = 1'b0;
+                Branch_reg = 1'b0;
+                ALUOp_reg = 2'b00; //add
+                Jump_reg = 1'b0;
+                sigext_high_reg = 1'b1;
+            end
             default: begin   // 默认情况
                 // 保持默认值（无操作）
             end
@@ -226,5 +237,6 @@ module MCU(
     assign ALUSrc = ALUSrc_reg;
     assign RegDst = RegDst_reg;
     assign RegWr = RegWr_reg;
+    assign sigext_high = sigext_high_reg;
 
 endmodule

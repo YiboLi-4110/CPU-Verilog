@@ -1,0 +1,7 @@
+module test_design (
+    input  logic a,
+    input  logic b,
+    output logic c
+);
+    assign c = a & b; // 简单的与门逻辑
+endmodule

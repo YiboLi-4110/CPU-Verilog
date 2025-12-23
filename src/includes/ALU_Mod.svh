@@ -1,7 +1,7 @@
 `ifndef ALU_OP_DEFS
 `define ALU_OP_DEFS
 
-`define OP_WIRENUM  4
+`define ALUCTRL_WIRENUM  4
 `define OP_NOP      4'b0000     //空操作
 `define OP_ADD      4'b0001     //加法
 `define OP_ADDU     4'b0010     //无符号加法
@@ -15,6 +15,6 @@
 `define OP_NOR      4'b1010     //按位或非
 `define OP_SLL      4'b1101     //逻辑左移
 `define OP_SRL      4'b1110     //逻辑右移
-`define OP_SRA      4'b1111     //算数右移a
+`define OP_SRA      4'b1111     //算数右移
 
 `endif

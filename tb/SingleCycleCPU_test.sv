@@ -22,6 +22,7 @@ module SingleCycleCPU (
     wire [3:0]  ALUCtrl, COND;
     wire [1:0]  ALUOp;
     wire RegDst, RegWr, Jump, Branch, ALUSrc, MemWr, MemRd, MemtoReg, shamt, branchmux, jumpmux;
+    wire sigext_high;
 
     reg CLK;
     reg rst_n;
@@ -30,8 +31,9 @@ module SingleCycleCPU (
     initial begin
         CLK = 0;
 
+        #30
         rst_n = 0;
-        #10;
+        #30;
         rst_n = 1;
 
         repeat (100) begin
@@ -56,6 +58,7 @@ module SingleCycleCPU (
     );
 
     DMem dmem(
+        .CLK(CLK),
         .we(MemWr),
         .re(MemRd),
         .data_addr(ALU_out),
@@ -139,6 +142,7 @@ module SingleCycleCPU (
     );
 
     SigExt16_32 sigext(
+        .high_ext(sigext_high),
         .input_data(Inst[15:0]),
         .output_data(SigExtout)
     );
@@ -188,7 +192,8 @@ module SingleCycleCPU (
         .MemRd(MemRd),
         .ALUSrc(ALUSrc),
         .RegDst(RegDst),
-        .RegWr(RegWr)
+        .RegWr(RegWr),
+        .sigext_high(sigext_high)
     );
 
 endmodule

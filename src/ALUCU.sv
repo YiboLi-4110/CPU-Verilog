@@ -10,7 +10,7 @@ module ALUCU (
     reg [`ALUCTRL_WIRENUM-1: 0] ALUCTRL_reg;
     reg shift_reg = 1'b0;
     always @(*) begin
-        if(ALUOp[1] == 1'b0)
+        if(ALUOp[1] == 1'b1)
             begin
                 case (funct)
                     `FUNC_ADD:

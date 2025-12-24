@@ -10,8 +10,9 @@ module MCU(
     output wire MemWr,  // 用于控制DMem的写信号
     output wire MemRd,  // 用于控制DMem的读信号
     output wire ALUSrc,  // 用于多路选择器
-    output wire RegDst,  // 用于多路选择器
+    output wire [1:0] RegDst,  // 用于多路选择器
     output wire RegWr,  // 用于RF的写信号
+    output wire RegPCWr, // new------用于控制PC值写入RF
     output wire sigext_high
 );
     
@@ -22,9 +23,10 @@ module MCU(
     reg MemWr_reg;
     reg MemRd_reg;
     reg ALUSrc_reg;
-    reg RegDst_reg;
+    reg [1:0] RegDst_reg;
     reg RegWr_reg;
     reg sigext_high_reg;
+    reg RegPCWr_reg;
 
     // 使用阻塞赋值实现组合逻辑
     always @(*) begin
@@ -36,14 +38,15 @@ module MCU(
         MemWr_reg = 1'b0;
         MemRd_reg = 1'b0;
         ALUSrc_reg = 1'b0;
-        RegDst_reg = 1'b0;
+        RegDst_reg = 2'b00;
         RegWr_reg = 1'b0;
         sigext_high_reg = 1'b0;
+        RegPCWr_reg = 1'b0;
 
         // 根据op_code设置控制信号
         case (op_code)
             `OP_CODE_RR: begin  // R型指令 (000000)
-                RegDst_reg = 1'b1;
+                RegDst_reg = 2'b01;
                 ALUSrc_reg = 1'b0;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -54,7 +57,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_LW: begin    // 加载字指令 (100011)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b1;
                 RegWr_reg = 1'b1;
@@ -135,7 +138,7 @@ module MCU(
                 Jump_reg = 1'b1;
             end
             `OP_CODE_ADDI: begin  // 立即数加法-有符号 (001000)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -146,7 +149,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_ADDIU: begin  // 立即数加法-无符号 (001001)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -157,7 +160,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_ANDI: begin  // 立即数与运算 (001100)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -168,7 +171,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_ORI: begin   // 立即数或运算 (001101)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -179,7 +182,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_XORI: begin   // 立即数异或运算 (001110)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -190,7 +193,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_SLTI: begin   // 小于立即数置1-有符号 (001010)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -201,7 +204,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_SLTIU: begin   // 小于立即数置1-无符号 (001011)
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -212,7 +215,7 @@ module MCU(
                 Jump_reg = 1'b0;
             end
             `OP_CODE_LUI:begin      //new-------
-                RegDst_reg = 1'b0;
+                RegDst_reg = 2'b00;
                 ALUSrc_reg = 1'b1;
                 MemtoReg_reg = 1'b0;
                 RegWr_reg = 1'b1;
@@ -222,6 +225,15 @@ module MCU(
                 ALUOp_reg = `ALUOp_ADD; //add
                 Jump_reg = 1'b0;
                 sigext_high_reg = 1'b1;
+            end
+            `OP_CODE_JAL:begin
+                RegDst_reg = 2'b11;
+                RegWr_reg = 1'b1;
+                MemRd_reg = 1'b0;
+                MemWr_reg = 1'b0;
+                Branch_reg = 1'b0;
+                Jump_reg = 1'b1;
+                RegPCWr_reg = 1'b1;
             end
             default: begin   // 默认情况
                 // 保持默认值（无操作）
@@ -239,5 +251,6 @@ module MCU(
     assign RegDst = RegDst_reg;
     assign RegWr = RegWr_reg;
     assign sigext_high = sigext_high_reg;
+    assign RegPCWr = RegPCWr_reg;
 
 endmodule

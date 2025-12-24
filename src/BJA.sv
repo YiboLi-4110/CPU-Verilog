@@ -21,6 +21,9 @@ module BJA (
     wire [4:0] jcode;
     assign jcode = inst[25:22];
 
+    wire [4:0] jrjcode;
+    assign jrjcode = inst[9:6];
+
     always_comb begin
         case (jb)
             2'b01:
@@ -55,10 +58,10 @@ module BJA (
                 end
             2'b10:
                 begin
-                    if(jcode != 4'b1111)
-                        cond_reg = jcode;
+                    if(opcode == 4'b0000)
+                        cond_reg = jrjcode;
                     else
-                        cond_reg = 4'b0000;
+                        cond_reg = jcode;
                 end
             default:
                 cond_reg = 4'b0000; 

@@ -15,13 +15,15 @@ module SingleCycleCPU (
 
 );
     wire [33:0] SHL2_1out;
-    wire [31:0] Inst, PCout, mux_1out, mux_2out, mux_3out, mux_4out, mux_5out, add_1out, add_2out, ALU_out, splice, SigExtout, R_data1, R_data2, Mem_data;
+    wire [31:0] Inst, PCout, mux_1out, mux_2out, mux_3out, mux_4out, mux_5out, mux_6out, mux_7out, add_1out, add_2out, ALU_out, splice, SigExtout, R_data1, R_data2, Mem_data;
     wire [23:0] SHL2_0out;
     wire [7:0]  FLAG;
     wire [4:0]  mux_0out;
     wire [3:0]  ALUCtrl, COND;
     wire [3:0]  ALUOp;
-    wire RegDst, RegWr, Jump, Branch, ALUSrc, MemWr, MemRd, MemtoReg, shamt, branchmux, jumpmux;
+    wire [1:0]  RegDst;
+    wire RegWr, Jump, Branch, ALUSrc, MemWr, MemRd, MemtoReg, shamt, branchmux, jumpmux;
+    wire RegPCWr, RegtoPC;
     wire sigext_high;
 
     reg CLK;
@@ -48,7 +50,7 @@ module SingleCycleCPU (
     PC pc(
         .CLK(CLK),
         .rst_n(rst_n),
-        .pc_in_addr(mux_4out),
+        .pc_in_addr(mux_3out),
         .pc_out_addr(PCout)
     );
 
@@ -70,7 +72,7 @@ module SingleCycleCPU (
         .clk(CLK),
         .we(RegWr),
         .waddr(mux_0out),
-        .wdata(mux_5out),
+        .wdata(mux_1out),
         .raddr1(Inst[25:21]),
         .raddr2(Inst[20:16]),
         .rdata1(R_data1),
@@ -93,52 +95,67 @@ module SingleCycleCPU (
 
     ALU alu(
         .A(R_data1),
-        .B(mux_2out),
+        .B(mux_4out),
         .Mod(ALUCtrl),
         .flags(FLAG),
         .C(ALU_out)
     );
 
-    MUX_2 #(.DATA_WIDTH(5)) mux_0(
+    MUX_3 #(.DATA_WIDTH(5)) mux_0(
         .input0(Inst[20:16]),
         .input1(Inst[15:11]),
+        .input2(5'b11111),
         .select(RegDst),
         .out_data(mux_0out)
     );
 
     MUX_2 mux_1(
-        .input0(R_data2),
-        .input1({27'b0, Inst[10:6]}),
-        .select(shamt),
+        .input0(mux_7out),
+        .input1(add_1out),
+        .select(RegPCWr),
         .out_data(mux_1out)
     );
 
     MUX_2 mux_2(
-        .input0(mux_1out),
-        .input1(SigExtout),
-        .select(ALUSrc),
+        .input0(R_data2),
+        .input1({27'b0, Inst[10:6]}),
+        .select(shamt),
         .out_data(mux_2out)
     );
 
     MUX_2 mux_3(
-        .input0(add_1out),
-        .input1(add_2out),
-        .select(branchmux),
+        .input0(mux_6out),
+        .input1(R_data1),
+        .select(RegtoPC),
         .out_data(mux_3out)
     );
 
     MUX_2 mux_4(
-        .input0(mux_3out),
-        .input1(splice),
-        .select(jumpmux),
+        .input0(mux_2out),
+        .input1(SigExtout),
+        .select(ALUSrc),
         .out_data(mux_4out)
     );
 
     MUX_2 mux_5(
+        .input0(add_1out),
+        .input1(add_2out),
+        .select(branchmux),
+        .out_data(mux_5out)
+    );
+
+    MUX_2 mux_6(
+        .input0(mux_5out),
+        .input1(splice),
+        .select(jumpmux),
+        .out_data(mux_6out)
+    );
+
+    MUX_2 mux_7(
         .input0(ALU_out),
         .input1(Mem_data),
         .select(MemtoReg),
-        .out_data(mux_5out)
+        .out_data(mux_7out)
     );
 
     SigExt16_32 sigext(
@@ -161,7 +178,8 @@ module SingleCycleCPU (
         .funct(Inst[5:0]),
         .ALUOp(ALUOp),
         .ALUCTRL(ALUCtrl),
-        .shift(shamt)
+        .shift(shamt),
+        .RegtoPC(RegtoPC)
     );
 
     BJA bja(
@@ -193,7 +211,8 @@ module SingleCycleCPU (
         .ALUSrc(ALUSrc),
         .RegDst(RegDst),
         .RegWr(RegWr),
-        .sigext_high(sigext_high)
+        .sigext_high(sigext_high),
+        .RegPCWr(RegPCWr)
     );
 
 endmodule

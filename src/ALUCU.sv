@@ -1,16 +1,17 @@
 `include "includes/ALU_Mod.svh"
+`include "includes/ALUOp_Mod.svh"
 `include "includes/Funct_Mod.svh"
 
 module ALUCU (
     input wire [5:0] funct,
-    input wire [1:0] ALUOp,
+    input wire [`ALUOp_WIRENUM-1:0] ALUOp,
     output wire [`ALUCTRL_WIRENUM-1: 0] ALUCTRL,
     output wire shift
 );
     reg [`ALUCTRL_WIRENUM-1: 0] ALUCTRL_reg;
     reg shift_reg = 1'b0;
     always @(*) begin
-        if(ALUOp[1] == 1'b1)
+        if(ALUOp == `ALUOp_R)
             begin
                 case (funct)
                     `FUNC_ADD:
@@ -79,10 +80,25 @@ module ALUCU (
         else
             begin
                 case (ALUOp)
-                    2'b00:
+                    `ALUOp_ADD:
                         ALUCTRL_reg = `OP_ADD;
-                    2'b01:
+                    `ALUOp_SUB:
                         ALUCTRL_reg = `OP_SUB;
+                    `ALUOp_ADDU:
+                        ALUCTRL_reg = `OP_ADDU;
+                    `ALUOp_SUBU:
+                        ALUCTRL_reg = `OP_SUBU;
+                    `ALUOp_AND:
+                        ALUCTRL_reg = `OP_AND;
+                    `ALUOp_OR:
+                        ALUCTRL_reg = `OP_OR;
+                    `ALUOp_XOR:
+                        ALUCTRL_reg = `OP_XOR;
+                    `ALUOp_SLT:
+                        ALUCTRL_reg = `OP_SLT;
+                    `ALUOp_SLTU:
+                        ALUCTRL_reg = `OP_SLTU;
+
                     default: 
                         ALUCTRL_reg = `OP_NOP;
                 endcase

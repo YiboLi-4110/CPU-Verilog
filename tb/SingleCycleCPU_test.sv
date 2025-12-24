@@ -20,7 +20,7 @@ module SingleCycleCPU (
     wire [7:0]  FLAG;
     wire [4:0]  mux_0out;
     wire [3:0]  ALUCtrl, COND;
-    wire [1:0]  ALUOp;
+    wire [3:0]  ALUOp;
     wire RegDst, RegWr, Jump, Branch, ALUSrc, MemWr, MemRd, MemtoReg, shamt, branchmux, jumpmux;
     wire sigext_high;
 
@@ -43,7 +43,7 @@ module SingleCycleCPU (
     end
 
 
-    assign splice = {SHL2_0out, add_1out[31:24]};
+    assign splice = {add_1out[31:24], SHL2_0out};
 
     PC pc(
         .CLK(CLK),

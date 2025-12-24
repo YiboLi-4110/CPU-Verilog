@@ -1,5 +1,5 @@
-`ifndef ALU_OP_DEFS
-`define ALU_OP_DEFS
+`ifndef ALU_CTRL_DEFS
+`define ALU_CTRL_DEFS
 
 `define ALUCTRL_WIRENUM  4
 `define OP_NOP      4'b0000     //空操作

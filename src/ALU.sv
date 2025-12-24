@@ -14,7 +14,7 @@ module ALU (
     reg [31:0] C_temp;
 
     wire [4:0] shamt; 
-    assign shamt = B[4:0];
+    assign shamt = A[4:0];
     
     always @(*) begin
         flags_reg = '0;
@@ -93,7 +93,7 @@ module ALU (
             end 
 
             `OP_SLL: begin  
-                C_temp = A << shamt;
+                C_temp = B << shamt;
                 flags_reg.CF = (shamt > 0) ? A[32 - shamt] : 1'b0;
                 flags_reg.ZF = (C_temp == 32'b0);
                 flags_reg.SF = C_temp[31];
@@ -101,7 +101,7 @@ module ALU (
             end
             
             `OP_SRL: begin  
-                C_temp = A >> shamt;
+                C_temp = B >> shamt;
                 flags_reg.CF = (shamt > 0) ? A[shamt - 1] : 1'b0;
                 flags_reg.ZF = (C_temp == 32'b0);
                 flags_reg.SF = C_temp[31]; 
@@ -109,7 +109,7 @@ module ALU (
             end
             
             `OP_SRA: begin  
-                C_temp = $signed(A) >>> shamt;
+                C_temp = $signed(B) >>> shamt;
 
                 flags_reg.CF = (shamt > 0) ? A[shamt - 1] : 1'b0;
                 flags_reg.ZF = (C_temp == 32'b0);

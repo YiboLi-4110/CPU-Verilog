@@ -12,7 +12,7 @@ module IMem (
     // 读指令地址
     integer i;
     initial begin
-        $readmemh("hexcode/jr_test.hex", instruction_mem);
+        $readmemh("hexcode/jalr_test.hex", instruction_mem);
 
         // 未初始化的指令应执行nop
         for (i=0; i<1024; i=i+1) begin

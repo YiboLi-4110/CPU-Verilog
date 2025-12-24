@@ -1,0 +1,5 @@
+00000000 //nop
+0c100003 //jal target
+00000000 //nop
+03e00008 //target: jr $ra 
+00000000 //nop

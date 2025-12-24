@@ -15,5 +15,6 @@
 `define FUNC_SRL        6'b000010
 `define FUNC_SRA        6'b000011
 `define FUNC_JR         6'b001000
+`define FUNC_JALR       6'b001001 
 
 `endif

@@ -58,7 +58,7 @@ module BJA (
                 end
             2'b10:
                 begin
-                    if(opcode == 4'b0000)
+                    if(opcode == 6'b000000)
                         cond_reg = jrjcode;
                     else
                         cond_reg = jcode;

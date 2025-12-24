@@ -36,6 +36,8 @@ module FLAGS (
         endcase 
 
         case (cond)
+            `COND_NOP:
+                cond_stf = 1'b1;
             `COND_E: 
                 cond_stf = flags_temp.ZF;
             `COND_NE: 

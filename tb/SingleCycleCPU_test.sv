@@ -23,7 +23,7 @@ module SingleCycleCPU (
     wire [3:0]  ALUOp;
     wire [1:0]  RegDst;
     wire RegWr, Jump, Branch, ALUSrc, MemWr, MemRd, MemtoReg, shamt, branchmux, jumpmux;
-    wire RegPCWr, RegtoPC;
+    wire RegPCWr, RegtoPC, RegPCWr_alu;
     wire sigext_high;
 
     reg CLK;
@@ -94,7 +94,7 @@ module SingleCycleCPU (
     );
 
     ALU alu(
-        .A(R_data1),
+        .A(mux_2out), //rdata1
         .B(mux_4out),
         .Mod(ALUCtrl),
         .flags(FLAG),
@@ -112,12 +112,12 @@ module SingleCycleCPU (
     MUX_2 mux_1(
         .input0(mux_7out),
         .input1(add_1out),
-        .select(RegPCWr),
+        .select(RegPCWr | RegPCWr_alu),
         .out_data(mux_1out)
     );
 
     MUX_2 mux_2(
-        .input0(R_data2),
+        .input0(R_data1),   //rdata2
         .input1({27'b0, Inst[10:6]}),
         .select(shamt),
         .out_data(mux_2out)
@@ -131,7 +131,7 @@ module SingleCycleCPU (
     );
 
     MUX_2 mux_4(
-        .input0(mux_2out),
+        .input0(R_data2), //mux_2out
         .input1(SigExtout),
         .select(ALUSrc),
         .out_data(mux_4out)
@@ -179,7 +179,8 @@ module SingleCycleCPU (
         .ALUOp(ALUOp),
         .ALUCTRL(ALUCtrl),
         .shift(shamt),
-        .RegtoPC(RegtoPC)
+        .RegtoPC(RegtoPC),
+        .RegPCWr(RegPCWr_alu)
     );
 
     BJA bja(

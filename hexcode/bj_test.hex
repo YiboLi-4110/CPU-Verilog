@@ -1,0 +1,8 @@
+2003001c // addi $v1, $zero, 28
+20100000 // addi $s0, $zero, 0
+20110001 // addi $s1, $zero, 1
+12110002 // beq $s0, $s1, target
+006000c8 // jra $v1
+201f0040 // addi $ra, $zero, 64
+20120080 // target: addi $s2, $zero, 128
+20110100 // addi $s1, $zero, 256

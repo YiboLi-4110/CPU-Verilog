@@ -50,7 +50,7 @@ module SingleCycleCPU (
     PC pc(
         .CLK(CLK),
         .rst_n(rst_n),
-        .pc_in_addr(mux_3out),
+        .pc_in_addr(mux_6out),
         .pc_out_addr(PCout)
     );
 
@@ -124,7 +124,7 @@ module SingleCycleCPU (
     );
 
     MUX_2 mux_3(
-        .input0(mux_6out),
+        .input0(splice),
         .input1(R_data1),
         .select(RegtoPC),
         .out_data(mux_3out)
@@ -146,7 +146,7 @@ module SingleCycleCPU (
 
     MUX_2 mux_6(
         .input0(mux_5out),
-        .input1(splice),
+        .input1(mux_3out),
         .select(jumpmux),
         .out_data(mux_6out)
     );
@@ -186,13 +186,13 @@ module SingleCycleCPU (
     BJA bja(
         .inst(Inst),
         .branch(Branch),
-        .jump(Jump),
+        .jump(Jump | RegtoPC),
         .cond(COND)
     );
 
     FLAGS flags(
         .CLK(CLK),
-        .jump(Jump),
+        .jump(Jump | RegtoPC),
         .branch(Branch),
         .rst_n(rst_n),
         .flags(FLAG),

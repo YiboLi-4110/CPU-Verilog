@@ -5,24 +5,26 @@ module FLAGS (
     input wire jump,
     input wire branch,
     input wire CLK,
+    input wire FLAGSWr,
     input wire rst_n,
     input FLAGS_t flags,
     input wire [`COND_WIRENUM-1:0] cond,
-    output wire jumpmux,
-    output wire branchmux
+    output wire PCWr
 );
     FLAGS_t flags_old;
+    FLAGS_t flags_old_next;
     FLAGS_t flags_temp;
     reg cond_stf;
     
     wire [1:0] jb;
     assign jb = {jump, branch};
+    assign flags_old_next = (FLAGSWr) ? ((jump) ? flags_old : flags) : flags_old;
 
     always_ff @(posedge CLK or negedge rst_n) begin
         if(~rst_n)
             flags_old <= '0;
         else
-            flags_old <= flags;
+            flags_old <= flags_old_next;
     end
 
     always_comb begin
@@ -71,7 +73,6 @@ module FLAGS (
         endcase
     end
 
-    assign jumpmux = jump && cond_stf;
-    assign branchmux = branch && cond_stf;
+    assign PCWr = (jump || branch) && cond_stf;
 
 endmodule

@@ -1,5 +1,0 @@
-20110064 // addi $s1, $zero, 100
-0cd00004 // jala target
-20120040 // addi $s2, $zero, 64
-03e00008 // jr $ra
-20120100 // target: addi $s2, $zero, 256

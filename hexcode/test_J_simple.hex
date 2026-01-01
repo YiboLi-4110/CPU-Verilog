@@ -1,0 +1,9 @@
+20100040 // addi $s0, $zero, 64
+20110080 // addi $s1, $zero, 128
+02119022 // sub $s2, $s0, $s1
+0a100007 // jl target
+201f0008 // addi $ra, $zero, 8
+201f0010 // addi $ra, $zero, 16
+20030010 // addi $v1, $zero, 16
+20030020 // target: addi $v1, $zero, 32
+201f0080 // addi $ra, $zero, 128

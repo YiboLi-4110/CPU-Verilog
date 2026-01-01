@@ -1,9 +1,0 @@
-20100000 // addi $s0, $zero, 0
-20110001 // addi $s1, $zero, 1
-02119022 // back: sub $s2, $s0, $s1
-1a400001 // blez $s2, forward
-20030200 // addi $v1, $zero, 512
-201f0100 // forward: addi $ra, $zero, $v1
-03e39022 // sub $s2, $ra, $v1
-1a40fffa // blez $s2, back
-00000000 // nop

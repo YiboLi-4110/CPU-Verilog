@@ -4,7 +4,8 @@
 
 module IMem (
     input wire [31:0] instruction_addr,
-    output wire [31:0] instruction
+    output wire [31:0] instruction,
+    output wire [31:0] instruction_foward
 );
     // 初始化指令存储器
     reg [31:0] instruction_mem [0:1023];
@@ -12,7 +13,7 @@ module IMem (
     // 读指令地址
     integer i;
     initial begin
-        $readmemh("hexcode/blez_test.hex", instruction_mem);
+        $readmemh("hexcode/test_R.hex", instruction_mem);
 
         // 未初始化的指令应执行nop
         for (i=0; i<1024; i=i+1) begin
@@ -24,5 +25,8 @@ module IMem (
 
     // 读出指令（地址最多支持2^12个字节，同时要除以4以得到指令的字地址）
     assign instruction = instruction_mem[instruction_addr[11:2]];
+
+    wire [9:0] index = instruction_addr[11:2] + 4'd4;
+    assign instruction_forward = (index < 1024) ? instruction_mem[index] : '0;
 
 endmodule
